@@ -45,15 +45,48 @@ function handleMessage(sender_psid, received_message) {
     let response;
     if (received_message.text) {
         response = {
-            "text": `You sent the message: "${received_message.text}". Now send me an image!`
+            "text": `Ito ny message nalefanao: "${received_message.text}". Andefaso sary hoe za zao!`
+        }
+    } else if (received_message.attachments) {
+        let attachment_url = received_message.attachments[0].payload.url;
+        response = {
+            "attachment": {
+                "type": "template",
+                "payload": {
+                    "template_type": "generic",
+                    "elements": [{
+                        "title": "Ito ve ilay sary?",
+                        "subtitle": "Tsindrio ny bokitra raha hamaly",
+                        "image_url": attachment_url,
+                        "buttons": [
+                            {
+                                "type": "postback",
+                                "title": "Eny!",
+                                "payload": "yes",
+                            },
+                            {
+                                "type": "postback",
+                                "title": "Tsia!",
+                                "payload": "no",
+                            }
+                        ],
+                    }]
+                }
+            }
         }
     }
     callSendAPI(sender_psid, response);
 }
 
-// Handles messaging_postbacks events
 function handlePostback(sender_psid, received_postback) {
-
+    let response;
+    let payload = received_postback.payload;
+    if (payload === 'yes') {
+        response = { "text": "Misaotra!" }
+    } else if (payload === 'no') {
+        response = { "text": "Oops, andefaso hafa ary e." }
+    }
+    callSendAPI(sender_psid, response);
 }
 
 function callSendAPI(sender_psid, response) {
